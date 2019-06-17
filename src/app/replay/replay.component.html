@@ -1,0 +1,52 @@
+<form>
+  <div class="input-group mb-3">
+    <div class="input-group-prepend">
+      <span class="input-group-text" id="summoner-name">Summoner Name</span>
+    </div>
+    <input type="text" class="form-control" placeholder="Your summoner name..." aria-label="Summoner"
+      aria-describedby="summoner-name" [(ngModel)]='summonerName' name='summonerName'>
+  </div>
+  <div class="form-group">
+    <select class="form-control" id="chooseServerControlSelect" [(ngModel)]='server' name="server">
+      <option>RU</option>
+      <option>KR</option>
+      <option>BR1</option>
+      <option>OC1</option>
+      <option>JP1</option>
+      <option>NA1</option>
+      <option>EUN1</option>
+      <option>EUW1</option>
+      <option>TR1</option>
+      <option>LA1</option>
+      <option>LA2</option>
+    </select>
+  </div>
+  <button type="button" class="btn btn-primary" (click)='findMatches(server, summonerName)'>Find matches</button>
+</form>
+
+<ng-container *ngIf="showMatchInfo">
+  <div class="spinner-border" role="status" *ngIf="matchInfoLoading else matchesTemplate">
+    <span class="sr-only">Loading...</span>
+  </div>
+</ng-container>
+
+<ng-template #matchesTemplate>
+  <div class="accordion" id="accordionMatchList">
+    <div class="card" *ngFor="let match of matchList.matches;let i = index;">
+      <div class="card-header" [id]='i'>
+        <h2 class="mb-0">
+          <button class="btn btn-link" type="button" data-toggle="collapse" [attr.data-target]='"#collapseOne" + i'
+            aria-expanded="true" [attr.aria-controls]='"collapseOne"+i' (click)='getMatchDetails(i)'>
+            Match {{i + 1}}
+          </button>
+        </h2>
+      </div>
+
+      <div [id]='"collapseOne"+i' class="collapse" [attr.aria-labelledby]='"collapseOne"+i' data-parent="#accordionMatchList">
+        <div class="card-body" #cardBody>
+          <app-match [matchReference]="match" [server]="server" [collapseId]='i' (backgroundColorChanged)='cardBody.style.backgroundColor = $event'></app-match>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

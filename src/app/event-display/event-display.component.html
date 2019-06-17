@@ -1,0 +1,25 @@
+<ng-container>
+    <div class="spinner-border" role="status" *ngIf="!eventDataLoaded else eventInfoTeplate">
+        <span class="sr-only">Loading...</span>
+    </div>
+</ng-container>
+
+<ng-template #eventInfoTeplate>
+    <div class="text" *ngIf='eventDataLoaded' else #loadingTemplate>
+        {{this.model.eventMinutesTime | number:'2.0-0'}}:{{this.model.eventSecondsTime | number:'2.0-0' }}
+        <img src="{{model?.killerImageUrl}}" class="rounded" alt="championImage">
+        >>>
+        <img src="{{model?.victimImageUrl}}" class="rounded" alt="championImage">
+    </div>
+    <div>
+        <label for="backOffsetRange">Back Offset</label>
+        <input type="range" class="form-control-range" id="backOffsetRange" min="-60" max="0"
+            [(ngModel)]="backOffsetValue" (ngModelChange)='backOffsetValue=$event'>
+    </div>
+    <div>
+        <input type="number" min="-60" max="0" class="form-control" id="backOffsetRangeValue"
+            [(ngModel)]="backOffsetValue" (ngModelChange)='backOffsetValue=$event'
+            [formControl]="backOffsetRangeControl" name="backOffsetRangeValue">
+        <md-error>lease enter a value between -50 and 0</md-error>
+    </div>
+</ng-template>
