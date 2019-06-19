@@ -21,9 +21,11 @@ export class EventDisplayComponent implements OnInit {
   eventDataLoaded;
   model: EventDisplayModel = new EventDisplayModel();
   backOffsetValue = 0;
-  backOffsetRangeControl = new FormControl(0, [Validators.max(0), Validators.min(-60), Validators.required]);
+  recordLengthValue = -this.backOffsetValue +5;
+  backOffsetRangeControl = new FormControl(this.backOffsetValue, [Validators.max(0), Validators.min(-60), Validators.required]);
+  recordLengthFormControl = new FormControl(this.recordLengthValue, [Validators.max(-this.backOffsetValue +60), Validators.min(-this.backOffsetValue +5), Validators.required]);
 
-
+  
   @Input("matchInfo")
   matchInfo: MatchInfo
 
@@ -39,6 +41,15 @@ export class EventDisplayComponent implements OnInit {
   constructor(private assetsRepository: AssetsRepository, private dataDragonRepository: DataDragonRepository, private championToIdMap: ChampionIdToChampionNameMap) { }
 
   ngOnInit() {
+    //test
+    this.backOffsetRangeControl.valueChanges.subscribe(newValue => {
+      console.log(this.recordLengthFormControl.value)
+      this.recordLengthFormControl.setValidators([Validators.max(-newValue +60), Validators.min(-newValue +5), Validators.required]);
+      this.recordLengthFormControl.updateValueAndValidity();
+      // this.recordLengthFormControl  = new FormControl(this.recordLengthValue, [Validators.max(-this.backOffsetValue +65), Validators.min(-this.backOffsetValue +5), Validators.required]);
+    });
+    //testEnd
+
     this.assetsRepository
       .loadJson()
       .subscribe(async resp => {

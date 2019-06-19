@@ -13,13 +13,46 @@
     </div>
     <div>
         <label for="backOffsetRange">Back Offset</label>
-        <input type="range" class="form-control-range" id="backOffsetRange" min="-60" max="0"
-            [(ngModel)]="backOffsetValue" (ngModelChange)='backOffsetValue=$event'>
+        <input type="range" class="form-control-range" min="-60" max="0" id="backOffsetRange" name="backOffsetRange"
+            [(ngModel)]="backOffsetValue"
+            (ngModelChange)='backOffsetValue=$event;backOffsetRangeControl.setValue($event)'>
     </div>
     <div>
-        <input type="number" min="-60" max="0" class="form-control" id="backOffsetRangeValue"
-            [(ngModel)]="backOffsetValue" (ngModelChange)='backOffsetValue=$event'
-            [formControl]="backOffsetRangeControl" name="backOffsetRangeValue">
-        <md-error>lease enter a value between -50 and 0</md-error>
+        <input type="number" min="-60" max="0" class="form-control" id="backOffset" name="backOffset"
+            [formControl]="backOffsetRangeControl" (ngModelChange)='backOffsetValue=$event'>
+        <div *ngIf="backOffsetRangeControl.invalid && (backOffsetRangeControl.dirty || backOffsetRangeControl.touched)"
+            class="alert alert-danger">
+            <div *ngIf="backOffsetRangeControl.errors.required">
+                Back Offset value is required.
+            </div>
+            <div *ngIf="backOffsetRangeControl.errors.min">
+                Back Offset value must be at minimum set to -60.
+            </div>
+            <div *ngIf="backOffsetRangeControl.errors.max">
+                Back Offset value must be at maximum set to 0.
+            </div>
+        </div>
+    </div>
+    <div>
+        <label for="recordLength">Recording length: </label>
+        <input type="number" [min]='-backOffsetValue+5' [max]='-backOffsetValue+60' class="form-control"
+            id="recordLength" name="recordLength" (ngModelChange)='recordLengthValue=$event'
+            [formControl]="recordLengthFormControl">
+        <div *ngIf="recordLengthFormControl.invalid"
+            class="alert alert-danger">
+            <div *ngIf="recordLengthFormControl.errors.required">
+                Recording length value is required.
+            </div>
+            <div *ngIf="recordLengthFormControl.errors.min">
+                Recording length value must be at minimum set to {{-backOffsetValue+5}} (You have set Back Offset to
+                {{backOffsetValue}}s., min. record time is 5s. Currently record time would be
+                {{recordLengthFormControl.value+backOffsetValue}}s., can't do :D ).
+            </div>
+            <div *ngIf="recordLengthFormControl.errors.max">
+                Recording length value must be at maximum set to {{-backOffsetValue+60}} (You have set Back Offset to
+                {{backOffsetValue}}, max. record time after death is 60s. Currently record time would be
+                {{recordLengthFormControl.value+backOffsetValue}}, can't do :D).
+            </div>
+        </div>
     </div>
 </ng-template>

@@ -15,6 +15,7 @@ import {} from 'typedjson';
 import { MatchDetailsComponent } from './match-details/match-details.component';
 import { EventDisplayComponent } from './event-display/event-display.component'
 import { ChampionIdToChampionNameMap } from './model/champion.id.to.name.map';
+import { MaterialModule } from './material.module';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { ChampionIdToChampionNameMap } from './model/champion.id.to.name.map';
     ReactiveFormsModule,
     RepositoryModule,
     AngularFontAwesomeModule,
+    MaterialModule,
     BsDropdownModule.forRoot()
   ],
   providers: [ChampionIdToChampionNameMap],

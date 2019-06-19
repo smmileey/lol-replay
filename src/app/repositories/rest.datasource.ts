@@ -1,38 +1,31 @@
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { Http, Request, RequestMethod, ResponseType, ResponseContentType } from '@angular/http'
-import { map } from 'rxjs/operators';
-import { MatchInfo } from '../model/match.info';
-import { MatchList } from '../model/match.list';
+import { HttpClient } from "@angular/common/http";
 
 const PROTOCOL = "https";
-const API_KEY = "RGAPI-55b2c9da-bc9d-443e-bf98-2d4d44520dae";
+const API_KEY = "RGAPI-3599826f-e37b-40c1-b0a5-2852baa33fcf";
 
 @Injectable()
 export class RestDataSource {
 
     baseUrl: string;
 
-    constructor(private http: Http)
-    {
+    constructor(private httpClient: HttpClient) {
     }
 
-    sendRequest(method: RequestMethod, url: string, body?: any, includeApiKey = true): Observable<MatchList | MatchInfo | any> 
-    {
-        let request = new Request({
-            method: method,
-            url: this.getUrl(url, includeApiKey),
-            body: body,
-            responseType: ResponseContentType.Json
-        });
-        return this.http.request(request)
-        .pipe(
-            map(res => res.json())
-        )
+    post<T>(url: string, body?: any, includeApiKey = true): Observable<T> {
+        return this.httpClient.post<T>(url, this.getUrl(url, includeApiKey));
     }
 
-    private getUrl(url: string, includeApiKey: boolean) : string
-    {
+    get<T>(url: string, body?: any, includeApiKey = true): Observable<T> {
+        return this.httpClient.get<T>(this.getUrl(url, includeApiKey));
+    }
+
+    delete<T>(url: string, body?: any, includeApiKey = true): Observable<T> {
+        return this.httpClient.post<T>(url, this.getUrl(url, includeApiKey));
+    }
+
+    private getUrl(url: string, includeApiKey: boolean): string {
         var baseUrl = PROTOCOL + "://" + url;
         return includeApiKey ? baseUrl + "?api_key=" + API_KEY : baseUrl;
     }

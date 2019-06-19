@@ -1,5 +1,5 @@
-import { Player } from '@angular/core/src/render3/interfaces/player';
 import { jsonObject, jsonMember } from 'typedjson';
+import { Player } from './player';
 
 @jsonObject
 export class ParticipantIdentity
