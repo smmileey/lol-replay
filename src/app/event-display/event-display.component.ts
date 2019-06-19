@@ -4,12 +4,11 @@ import { Participant } from '../model/participant';
 import { MatchEvent } from '../model/match.event';
 import { EventDisplayModel } from '../model/event.display.model';
 import { AssetsRepository } from '../repositories/assets.repostiory';
-import { ChampionIdToChampionNameMap } from '../model/champion.id.to.name.map';
-import { DataDragonRepository } from '../repositories/ddragon.repository';
 import { EventType } from '../model/event.type';
 import { FormControl, Validators } from '@angular/forms';
+import { ChampionInfoProvider } from '../providers/champion.info.provider';
 
-const MINION = "Minion";
+const PVP_EVENTS = [EventType.Kill, EventType.Death]
 
 @Component({
   selector: 'app-event-display',
@@ -21,11 +20,11 @@ export class EventDisplayComponent implements OnInit {
   eventDataLoaded;
   model: EventDisplayModel = new EventDisplayModel();
   backOffsetValue = 0;
-  recordLengthValue = -this.backOffsetValue +5;
+  recordLengthValue = -this.backOffsetValue + 5;
   backOffsetRangeControl = new FormControl(this.backOffsetValue, [Validators.max(0), Validators.min(-60), Validators.required]);
-  recordLengthFormControl = new FormControl(this.recordLengthValue, [Validators.max(-this.backOffsetValue +60), Validators.min(-this.backOffsetValue +5), Validators.required]);
+  recordLengthFormControl = new FormControl(this.recordLengthValue, [Validators.max(-this.backOffsetValue + 60), Validators.min(-this.backOffsetValue + 5), Validators.required]);
 
-  
+
   @Input("matchInfo")
   matchInfo: MatchInfo
 
@@ -38,80 +37,65 @@ export class EventDisplayComponent implements OnInit {
   @Input("eventType")
   eventType: EventType;
 
-  constructor(private assetsRepository: AssetsRepository, private dataDragonRepository: DataDragonRepository, private championToIdMap: ChampionIdToChampionNameMap) { }
+  private readonly MaxRecordTimeAfterEventTimestamp = 60;
+  private readonly MinRecordingLength = 5;
+
+  constructor(
+    private assetsRepository: AssetsRepository,
+    private championInfoProvider: ChampionInfoProvider) { }
 
   ngOnInit() {
-    //test
-    this.backOffsetRangeControl.valueChanges.subscribe(newValue => {
-      console.log(this.recordLengthFormControl.value)
-      this.recordLengthFormControl.setValidators([Validators.max(-newValue +60), Validators.min(-newValue +5), Validators.required]);
-      this.recordLengthFormControl.updateValueAndValidity();
-      // this.recordLengthFormControl  = new FormControl(this.recordLengthValue, [Validators.max(-this.backOffsetValue +65), Validators.min(-this.backOffsetValue +5), Validators.required]);
-    });
-    //testEnd
+    this.UpdateRecordLengthErrorOnBackOffsetChange();
 
     this.assetsRepository
-      .loadJson()
-      .subscribe(async resp => {
-        this.calculateEventTime(this.eventInfo.timestamp);
-
-        let killerName = this.getKillerName()
-        if (this.isKillerChampion(killerName)) this.model.championDetails = await resp.data[killerName];
-
-        //todo: extract to getEventData() or smth
-        this.model.killerImageUrl = await this.getKillerImageUrl(killerName);
-        this.model.victimImageUrl = await this.getVictimImageUrl()
+      .loadChampionsDetails()
+      .subscribe(async response => {
+        await this.calculateEventTime(this.eventInfo.timestamp);
+        await this.loadEventDisplayDataAsync(response);
         this.eventDataLoaded = true;
       }, err => {
+        //todo: handle this better
         console.log("Error: " + err)
       })
   }
 
-  calculateEventTime(timestamp: number) {
+  private async loadEventDisplayDataAsync(response: import("e:/AngularProjects/LoL/lol-project/src/app/model/champions.info").ChampionInfo) {
+    let eventOwnerName = this.getEventOwnerName();
+    if (this.championInfoProvider.isChampion(eventOwnerName)) this.model.championDetails = await response.data[eventOwnerName];
+
+    if (PVP_EVENTS.includes(this.eventType)) {
+      this.model.killerImageUrl = await this.championInfoProvider.getKillerImageUrl(this.model.championDetails, eventOwnerName);
+      this.model.victimImageUrl = await this.championInfoProvider.getVictimImageUrl(this.eventInfo, this.matchInfo);
+    }
+  }
+
+  private UpdateRecordLengthErrorOnBackOffsetChange() {
+    this.backOffsetRangeControl.valueChanges.subscribe(newValue => {
+      let maxValue = -newValue + this.MaxRecordTimeAfterEventTimestamp;
+      let minValue = -newValue + this.MinRecordingLength;
+      this.recordLengthFormControl.setValidators([Validators.max(maxValue), Validators.min(minValue), Validators.required]);
+      this.recordLengthFormControl.updateValueAndValidity();
+    });
+  }
+
+  async calculateEventTime(timestamp: number) {
     let date = new Date(timestamp);
     this.model.eventMinutesTime = (date.getHours() - 1) * 60 + date.getMinutes();
     this.model.eventSecondsTime = date.getSeconds();
   }
 
-  getKillerName(): string {
-    if (this.eventType == EventType.Kill) return this.formatChampionNameForGetParameter(this.mapChampionIdToChampionName(this.chosenSummoner.championId));
+  getEventOwnerName(): string {
+    if (this.eventType == EventType.Kill) {
+      let championName = this.championInfoProvider.mapChampionIdToChampionName(this.chosenSummoner.championId)
+      return this.championInfoProvider.formatChampionNameForRiotApiFormat(championName);
+    }
+
     if (this.eventType == EventType.Death) {
       let killerParticipantId = this.matchInfo.participants.find(participant => participant.participantId == this.eventInfo.killerId);
-      return this.formatChampionNameForGetParameter(this.mapChampionIdToChampionName(killerParticipantId ? killerParticipantId.championId : this.eventInfo.killerId));
+      let championName = this.championInfoProvider.mapChampionIdToChampionName(killerParticipantId ? killerParticipantId.championId : this.eventInfo.killerId)
+      return this.championInfoProvider.formatChampionNameForRiotApiFormat(championName);
     }
 
     throw new Error(`Unsuported EventType: ${this.eventType}`);
-  }
-
-  formatChampionNameForGetParameter(unformattedChampionName: string) {
-    return unformattedChampionName
-      .replace(' ', '')
-      .replace('\'', '')
-      .replace('.', '')
-      .replace('VelKoz', 'Velkoz')
-      .replace('ChoGath', 'Chogath');
-  }
-
-  mapChampionIdToChampionName(championId: number): string {
-    return this.championToIdMap.mappings.get(championId.toString())
-  }
-
-  isKillerChampion(killerName: string): boolean {
-    return killerName != MINION; //XD ehh RafaelloLolipop, corner case...
-  }
-
-  getKillerImageUrl(killerName: string): string | PromiseLike<string> {
-    return killerName != MINION
-      ? this.dataDragonRepository.getChampionImageUrl(this.formatChampionNameForGetParameter(this.model.championDetails.name))
-      : this.assetsRepository.getMinionImageUrl();
-  }
-
-  getVictimImageUrl(): string | PromiseLike<string> {
-    let victimChampionId = this.getVictimChampionId(this.eventInfo.victimId);
-    return this.dataDragonRepository.getChampionImageUrl(this.formatChampionNameForGetParameter(this.mapChampionIdToChampionName(victimChampionId)));
-  }
-
-  getVictimChampionId(victimId: number): number {
-    return this.matchInfo.participants.find(participant => participant.participantId == victimId).championId;
   }
 }

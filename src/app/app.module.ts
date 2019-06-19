@@ -16,6 +16,7 @@ import { MatchDetailsComponent } from './match-details/match-details.component';
 import { EventDisplayComponent } from './event-display/event-display.component'
 import { ChampionIdToChampionNameMap } from './model/champion.id.to.name.map';
 import { MaterialModule } from './material.module';
+import { ChampionInfoProvider } from './providers/champion.info.provider';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,7 @@ import { MaterialModule } from './material.module';
     MaterialModule,
     BsDropdownModule.forRoot()
   ],
-  providers: [ChampionIdToChampionNameMap],
+  providers: [ChampionIdToChampionNameMap, ChampionInfoProvider],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
