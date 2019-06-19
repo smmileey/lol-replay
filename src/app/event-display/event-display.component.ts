@@ -7,6 +7,7 @@ import { AssetsRepository } from '../repositories/assets.repostiory';
 import { EventType } from '../model/event.type';
 import { FormControl, Validators } from '@angular/forms';
 import { ChampionInfoProvider } from '../providers/champion.info.provider';
+import { ChampionInfo } from '../model/champions.info';
 
 const PVP_EVENTS = [EventType.Kill, EventType.Death]
 
@@ -73,7 +74,7 @@ export class EventDisplayComponent implements OnInit {
       })
   }
 
-  private async loadEventDisplayDataAsync(response: import("e:/AngularProjects/LoL/lol-project/src/app/model/champions.info").ChampionInfo) {
+  private async loadEventDisplayDataAsync(response: ChampionInfo) {
     let eventOwnerName = this.getEventOwnerName();
     if (this.championInfoProvider.isChampion(eventOwnerName)) this.model.championDetails = await response.data[eventOwnerName];
 

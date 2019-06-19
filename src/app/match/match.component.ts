@@ -1,10 +1,12 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { MatchRepository } from '../repositories/match.repository';
-import { TypedJSON } from 'typedjson';
 import { MatchReference } from '../model/match.reference';
 import { MatchInfo } from '../model/match.info';
 import { MatchTimeLine } from '../model/match.timeline';
 import { Participant } from '../model/participant';
+
+const GreenColor = "green";
+const RedColor = "red";
 
 @Component({
   selector: 'app-match',
@@ -13,11 +15,13 @@ import { Participant } from '../model/participant';
 })
 export class MatchComponent implements OnInit {
 
-  isMatchInfoLoaded = false;
-  collapsed = false;
+  isMatchInfoLoaded;
+  collapsed;
   matchTimeLine: MatchTimeLine;
   matchInfo: MatchInfo;
   chosenSummoner: Participant;
+
+  private readonly VictoryIndicator = "Win";
 
   constructor(private matchRepository: MatchRepository) {
   }
@@ -39,13 +43,11 @@ export class MatchComponent implements OnInit {
   async getMatchDetails() {
     if (!this.collapsed) {
       this.collapsed = !this.collapsed;
-      let matchTimeLineJson = await this.matchRepository.getMatchTimeLineInfo(this.server, this.matchReference.gameId);
-      let matchDetalis = await this.matchRepository.getMatchInfo(this.server, this.matchReference.gameId);
-      let timeLineSerializer = new TypedJSON(MatchTimeLine);
-      let matchDetailsSerializer = new TypedJSON(MatchInfo);
-      this.matchTimeLine = timeLineSerializer.parse(matchTimeLineJson);
-      this.matchInfo = matchDetailsSerializer.parse(matchDetalis);
+
+      this.matchTimeLine = await this.matchRepository.getMatchTimeLineInfo(this.server, this.matchReference.gameId);
+      this.matchInfo = await this.matchRepository.getMatchInfo(this.server, this.matchReference.gameId);
       this.backgroundColorChanged.next(this.getMatchWinOrLoseColorIndicator())
+      
       this.isMatchInfoLoaded = true;
     }
   }
@@ -55,6 +57,6 @@ export class MatchComponent implements OnInit {
       let championId = this.matchReference.champion;
       this.chosenSummoner = this.matchInfo.participants.find(participant => participant.championId == championId);
       let winOrLose = this.matchInfo.teams.find(team => team.teamId == this.chosenSummoner.teamId).win;
-      return winOrLose == "Win" ? "green" : "red";
+      return winOrLose == this.VictoryIndicator ? GreenColor : RedColor;
   }
 }

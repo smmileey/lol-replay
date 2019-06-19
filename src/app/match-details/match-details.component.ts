@@ -21,7 +21,6 @@ export class MatchDetailsComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-
   }
 
   @Input("matchTimeLine")
@@ -34,10 +33,10 @@ export class MatchDetailsComponent implements OnInit {
   chosenSummoner: Participant;
 
   @Input("collapseId")
-  collapseId:number;
+  collapseId: number;
 
   async getEvents(eventType: EventType) {
-    if (eventType == EventType.Kill) this.getKillEvents()
+    if (eventType == EventType.Kill) this.getKillEvents();
     if (eventType == EventType.Death) this.getDeathEvents();
   }
 
@@ -52,7 +51,6 @@ export class MatchDetailsComponent implements OnInit {
   private async getDeathEvents() {
     if (this.deathEvents.length > 0) return;
 
-    console.log(this.matchTimeLine.frames);
     await this.matchTimeLine.frames.forEach(frame => {
       this.deathEvents = this.deathEvents.concat(frame.events.filter(evt => evt.type == CHAMPION_KILL && evt.victimId == this.chosenSummoner.participantId))
     })

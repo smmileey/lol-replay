@@ -4,8 +4,8 @@ import { Injectable } from '@angular/core';
 import { ChampionInfo } from '../model/champions.info';
 import { HttpClient } from '@angular/common/http';
 
-const ChampionsInfoPath = 'assets/champions.json';
-const MinionImageUrl = "assets/minion2.jpg";
+const ChampionsInfoPath = 'assets/Data/champions.json';
+const MinionImageUrl = "assets/Images/minion.jpg";
 
 @Injectable()
 export class AssetsRepository {
