@@ -13,12 +13,13 @@
                 Tu beda podstawowe dane o meczu (szczegoly w statystykach)
             </div>
             <div class="col-auto mr-auto">
-                <button data-toggle="collapse" [attr.href]='"#detailsCollapse"+collapseId' role="button" aria-expanded="false"
-                    [attr.aria-controls]='"detailsCollapse"+collapseId'>
+                <button data-toggle="collapse" [attr.href]='"#detailsCollapse"+collapseId' role="button"
+                    aria-expanded="false" [attr.aria-controls]='"detailsCollapse"+collapseId'>
                     <i class="fa fa-arrow-circle-o-down fa-lg"></i>
                 </button>
             </div>
         </div>
-        <app-match-details [matchTimeLine]='matchTimeLine' [matchInfo]='matchInfo' [chosenSummoner]='chosenSummoner' [collapseId]='collapseId'></app-match-details>
+        <app-match-details [matchTimeLine]='matchTimeLine' [matchInfo]='matchInfo' [chosenSummoner]='chosenSummoner'
+            [collapseId]='collapseId'></app-match-details>
     </div>
 </ng-template>

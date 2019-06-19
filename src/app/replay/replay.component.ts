@@ -15,8 +15,8 @@ export class ReplayComponent implements OnInit {
   
   matchInfoLoading ;
   showMatchInfo;
-  server = 'EUN1';
-  summonerName = 'ColSerrai';
+  server = 'EUN1'; //todo: load from configuration file
+  summonerName = 'ColSerrai'; //todo: load from configuration file
   matchList: MatchList = new MatchList();
 
   private readonly MaxMatchesNumber = 10;
