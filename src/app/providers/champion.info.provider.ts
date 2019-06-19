@@ -17,9 +17,33 @@ export class ChampionInfoProvider {
         private assetsRepository: AssetsRepository) {
     }
 
+    getKillerImageUrl(eventInfo: MatchEvent, matchInfo: MatchInfo): string | PromiseLike<string> {
+        if (eventInfo == null) throw new Error("EventInfo not provided.");
+
+        let killerChampionId = this.getChampionId(eventInfo.killerId, matchInfo);
+        let championName = this.mapChampionIdToChampionName(killerChampionId);
+        if (championName == MINION) return this.assetsRepository.getMinionImageUrl();
+
+        let formattedChampionName = this.formatChampionNameForRiotApiFormat(championName);
+        return this.dataDragonRepository.getChampionImageUrl(formattedChampionName);
+    }
+
+    getVictimImageUrl(eventInfo: MatchEvent, matchInfo: MatchInfo): string | PromiseLike<string> {
+        if (eventInfo == null) throw new Error("EventInfo not provided.");
+
+        let victimChampionId = this.getChampionId(eventInfo.victimId, matchInfo);
+        let championName = this.mapChampionIdToChampionName(victimChampionId);
+        let formattedChampionName = this.formatChampionNameForRiotApiFormat(championName);
+        return this.dataDragonRepository.getChampionImageUrl(formattedChampionName);
+    }
+  
+    mapChampionIdToChampionName(championId: number): string {
+        return this.championToIdMap.mappings.get(championId.toString())
+    }
+
     formatChampionNameForRiotApiFormat(unformattedChampionName: string) {
-        if(!unformattedChampionName) throw new Error("Champion name not provided.");
-        
+        if (!unformattedChampionName) throw new Error("Champion name not provided.");
+
         return unformattedChampionName
             .replace(' ', '')
             .replace('\'', '')
@@ -27,33 +51,11 @@ export class ChampionInfoProvider {
             .replace('VelKoz', 'Velkoz')
             .replace('ChoGath', 'Chogath');
     }
+    
+    private getChampionId(participantId: number, matchInfo: MatchInfo): number {
+        if (matchInfo == null || matchInfo.participants == null) throw new Error("Insufficient data in MatchInfo.")
 
-    mapChampionIdToChampionName(championId: number): string {
-        return this.championToIdMap.mappings.get(championId.toString())
-    }
-
-    isChampion(eventOwnerName: string): boolean {
-        return eventOwnerName != MINION;
-    }
-
-    getKillerImageUrl(championDetails: ChampionDetails, killerName: string): string | PromiseLike<string> {
-        if (killerName == MINION) return this.assetsRepository.getMinionImageUrl();
-
-        if (championDetails == null) throw new Error("ChampionDetails not provided.")
-        return this.dataDragonRepository.getChampionImageUrl(this.formatChampionNameForRiotApiFormat(championDetails.name))
-    }
-
-    getVictimImageUrl(eventInfo: MatchEvent, matchInfo: MatchInfo): string | PromiseLike<string> {
-        if (eventInfo == null) throw new Error("EventInfo not provided.");
-
-        let victimChampionId = this.getVictimChampionId(eventInfo.victimId, matchInfo);
-        let formattedChampionName = this.formatChampionNameForRiotApiFormat(this.mapChampionIdToChampionName(victimChampionId));
-        return this.dataDragonRepository.getChampionImageUrl(formattedChampionName);
-    }
-
-    private getVictimChampionId(victimId: number, matchInfo: MatchInfo): number {
-        if(matchInfo == null || matchInfo.participants == null) throw new Error("Insufficient data in MatchInfo.")
-
-        return matchInfo.participants.find(participant => participant.participantId == victimId).championId;
+        let participant = matchInfo.participants.find(participant => participant.participantId == participantId);
+        return participant ? participant.championId : participantId;
     }
 }

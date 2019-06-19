@@ -19,7 +19,7 @@ export class ReplayComponent implements OnInit {
   summonerName = 'ColSerrai';
   matchList: MatchList = new MatchList();
 
-  private readonly MaxMatchesNumber = 5;
+  private readonly MaxMatchesNumber = 10;
 
   constructor(private matchRepository: MatchRepository) 
   { 

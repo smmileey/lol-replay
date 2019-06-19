@@ -74,46 +74,6 @@ export class EventDisplayComponent implements OnInit {
       })
   }
 
-  private async loadEventDisplayDataAsync(response: ChampionInfo) {
-    let eventOwnerName = this.getEventOwnerName();
-    if (this.championInfoProvider.isChampion(eventOwnerName)) this.model.championDetails = await response.data[eventOwnerName];
-
-    if (PVP_EVENTS.includes(this.eventType)) {
-      this.model.killerImageUrl = await this.championInfoProvider.getKillerImageUrl(this.model.championDetails, eventOwnerName);
-      this.model.victimImageUrl = await this.championInfoProvider.getVictimImageUrl(this.eventInfo, this.matchInfo);
-    }
-  }
-
-  private UpdateRecordLengthErrorOnBackOffsetChange() {
-    this.backOffseInput.valueChanges.subscribe(newValue => {
-      let maxValue = -newValue + this.MaxRecordTimeAfterEventTimestamp;
-      let minValue = -newValue + this.MinRecordingLength;
-      this.recordLengthFormControl.setValidators([Validators.max(maxValue), Validators.min(minValue), Validators.required]);
-      this.recordLengthFormControl.updateValueAndValidity();
-    });
-  }
-
-  async calculateEventTime(timestamp: number) {
-    let date = new Date(timestamp);
-    this.model.eventMinutesTime = (date.getHours() - 1) * 60 + date.getMinutes();
-    this.model.eventSecondsTime = date.getSeconds();
-  }
-
-  getEventOwnerName(): string {
-    if (this.eventType == EventType.Kill) {
-      let championName = this.championInfoProvider.mapChampionIdToChampionName(this.chosenSummoner.championId)
-      return this.championInfoProvider.formatChampionNameForRiotApiFormat(championName);
-    }
-
-    if (this.eventType == EventType.Death) {
-      let killerParticipantId = this.matchInfo.participants.find(participant => participant.participantId == this.eventInfo.killerId);
-      let championName = this.championInfoProvider.mapChampionIdToChampionName(killerParticipantId ? killerParticipantId.championId : this.eventInfo.killerId)
-      return this.championInfoProvider.formatChampionNameForRiotApiFormat(championName);
-    }
-
-    throw new Error(`Unsuported EventType: ${this.eventType}`);
-  }
-
   applyBackOffsetRangeChange(backOffsetRangeValue: number) {
     this.backOffsetValue = backOffsetRangeValue;
     this.backOffseInput.setValue(backOffsetRangeValue);
@@ -125,5 +85,34 @@ export class EventDisplayComponent implements OnInit {
 
   applyRecordLengthInputChange(recordLengthInputValue: number) {
     this.recordLengthValue = recordLengthInputValue;
+  }
+  
+  private UpdateRecordLengthErrorOnBackOffsetChange() {
+    this.backOffseInput.valueChanges.subscribe(newValue => {
+      let maxValue = -newValue + this.MaxRecordTimeAfterEventTimestamp;
+      let minValue = -newValue + this.MinRecordingLength;
+      this.recordLengthFormControl.setValidators([Validators.max(maxValue), Validators.min(minValue), Validators.required]);
+      this.recordLengthFormControl.updateValueAndValidity();
+    });
+  }
+
+  private async calculateEventTime(timestamp: number) {
+    let date = new Date(timestamp);
+    this.model.eventMinutesTime = (date.getHours() - 1) * 60 + date.getMinutes();
+    this.model.eventSecondsTime = date.getSeconds();
+  }
+
+  private async loadEventDisplayDataAsync(response: ChampionInfo) {
+    this.model.championDetails = await response.data[this.getEventOwnerName()];
+
+    if (PVP_EVENTS.includes(this.eventType)) {
+      this.model.killerImageUrl = await this.championInfoProvider.getKillerImageUrl(this.eventInfo, this.matchInfo);
+      this.model.victimImageUrl = await this.championInfoProvider.getVictimImageUrl(this.eventInfo, this.matchInfo);
+    }
+  }
+  
+  private getEventOwnerName(): string {
+    let championName = this.championInfoProvider.mapChampionIdToChampionName(this.chosenSummoner.championId)
+    return this.championInfoProvider.formatChampionNameForRiotApiFormat(championName);
   }
 }
