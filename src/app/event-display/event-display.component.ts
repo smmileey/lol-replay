@@ -17,14 +17,6 @@ const PVP_EVENTS = [EventType.Kill, EventType.Death]
 })
 export class EventDisplayComponent implements OnInit {
 
-  eventDataLoaded;
-  model: EventDisplayModel = new EventDisplayModel();
-  backOffsetValue = 0;
-  recordLengthValue = -this.backOffsetValue + 5;
-  backOffsetRangeControl = new FormControl(this.backOffsetValue, [Validators.max(0), Validators.min(-60), Validators.required]);
-  recordLengthFormControl = new FormControl(this.recordLengthValue, [Validators.max(-this.backOffsetValue + 60), Validators.min(-this.backOffsetValue + 5), Validators.required]);
-
-
   @Input("matchInfo")
   matchInfo: MatchInfo
 
@@ -37,8 +29,30 @@ export class EventDisplayComponent implements OnInit {
   @Input("eventType")
   eventType: EventType;
 
+  @Input("eventDisplayId")
+  eventDisplayId: number;
+
   private readonly MaxRecordTimeAfterEventTimestamp = 60;
   private readonly MinRecordingLength = 5;
+
+  model: EventDisplayModel = new EventDisplayModel();
+  eventDataLoaded;
+  backOffsetValue = 0;
+  recordLengthValue = -this.backOffsetValue + this.MinRecordingLength;
+  backOffseInput = new FormControl(
+    this.backOffsetValue,
+    [
+      Validators.max(0),
+      Validators.min(-this.MaxRecordTimeAfterEventTimestamp),
+      Validators.required
+    ]);
+  recordLengthFormControl = new FormControl(
+    this.recordLengthValue,
+    [
+      Validators.max(-this.backOffsetValue + this.MaxRecordTimeAfterEventTimestamp),
+      Validators.min(-this.backOffsetValue + this.MinRecordingLength),
+      Validators.required
+    ]);
 
   constructor(
     private assetsRepository: AssetsRepository,
@@ -70,7 +84,7 @@ export class EventDisplayComponent implements OnInit {
   }
 
   private UpdateRecordLengthErrorOnBackOffsetChange() {
-    this.backOffsetRangeControl.valueChanges.subscribe(newValue => {
+    this.backOffseInput.valueChanges.subscribe(newValue => {
       let maxValue = -newValue + this.MaxRecordTimeAfterEventTimestamp;
       let minValue = -newValue + this.MinRecordingLength;
       this.recordLengthFormControl.setValidators([Validators.max(maxValue), Validators.min(minValue), Validators.required]);
@@ -97,5 +111,18 @@ export class EventDisplayComponent implements OnInit {
     }
 
     throw new Error(`Unsuported EventType: ${this.eventType}`);
+  }
+
+  applyBackOffsetRangeChange(backOffsetRangeValue: number) {
+    this.backOffsetValue = backOffsetRangeValue;
+    this.backOffseInput.setValue(backOffsetRangeValue);
+  }
+
+  applyBackOffsetInputChange(backOffsetInputValue: number) {
+    this.backOffsetValue = backOffsetInputValue;
+  }
+
+  applyRecordLengthInputChange(recordLengthInputValue: number) {
+    this.recordLengthValue = recordLengthInputValue;
   }
 }
