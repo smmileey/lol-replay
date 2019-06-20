@@ -1,4 +1,4 @@
-import { jsonObject, jsonMember, jsonMapMember } from 'typedjson';
+import { jsonObject, jsonMember } from 'typedjson';
 import { PerMinuteDeltaInfo } from './per.min.delta.info';
 
 @jsonObject

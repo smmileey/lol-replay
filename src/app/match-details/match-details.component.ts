@@ -1,10 +1,10 @@
 import { Component, OnInit, Input, ViewChildren, QueryList } from '@angular/core';
-import { MatchInfo } from '../model/match.info';
-import { MatchTimeLine } from '../model/match.timeline';
-import { Participant } from '../model/participant';
-import { MatchEvent } from '../model/match.event';
-import { EventType } from '../model/event.type';
+import { MatchTimeLine } from '../model/match/match.timeline';
+import { Participant } from '../model/participant/participant';
+import { EventType } from '../model/event/event.type';
 import { EventDisplayComponent } from '../event-display/event-display.component';
+import { MatchEvent } from '../model/match/match.event';
+import { MatchInfo } from '../model/match/match.info';
 
 const CHAMPION_KILL = "CHAMPION_KILL";
 

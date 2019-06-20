@@ -1,5 +1,5 @@
 import { ChampionDetails } from './champion.details';
-import { jsonObject, jsonMapMember, jsonMember } from 'typedjson';
+import { jsonObject, jsonMember } from 'typedjson';
 
 @jsonObject
 export class ChampionDetailsMap 

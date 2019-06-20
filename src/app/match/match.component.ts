@@ -1,9 +1,9 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { MatchRepository } from '../repositories/match.repository';
-import { MatchReference } from '../model/match.reference';
-import { MatchInfo } from '../model/match.info';
-import { MatchTimeLine } from '../model/match.timeline';
-import { Participant } from '../model/participant';
+import { MatchTimeLine } from '../model/match/match.timeline';
+import { Participant } from '../model/participant/participant';
+import { MatchInfo } from '../model/match/match.info';
+import { MatchReference } from '../model/match/match.reference';
 
 const GreenColor = "green";
 const RedColor = "red";

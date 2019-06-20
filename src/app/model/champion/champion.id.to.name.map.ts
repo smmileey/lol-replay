@@ -1,5 +1,5 @@
-import { JSDictionary } from './js.dictionary';
 import { Injectable } from '@angular/core';
+import { JSDictionary } from '../js.dictionary';
 
 @Injectable()
 export class ChampionIdToChampionNameMap {

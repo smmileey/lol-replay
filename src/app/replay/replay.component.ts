@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, ViewChildren, QueryList } from '@angular/core';
 import { MatchRepository } from '../repositories/match.repository';
-import { MatchList } from '../model/match.list';
 import { MatchComponent } from '../match/match.component';
+import { MatchList } from '../model/match/match.list';
 
 @Component({
   selector: 'app-replay',

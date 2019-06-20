@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { RestDataSource } from './rest.datasource';
-import { MatchInfo } from '../model/match.info';
-import { MatchList } from '../model/match.list';
-import { MatchTimeLine } from '../model/match.timeline';
+import { MatchTimeLine } from '../model/match/match.timeline';
+import { MatchList } from '../model/match/match.list';
+import { MatchInfo } from '../model/match/match.info';
 
 const summonerByNameBase = ".api.riotgames.com/lol/summoner/v4/summoners/by-name/";
 const matchesBySummoner = ".api.riotgames.com/lol/match/v4/matchlists/by-account/";

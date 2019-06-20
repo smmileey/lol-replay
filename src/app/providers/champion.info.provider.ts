@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
-import { ChampionIdToChampionNameMap } from '../model/champion.id.to.name.map';
 import { DataDragonRepository } from '../repositories/ddragon.repository';
 import { AssetsRepository } from '../repositories/assets.repostiory';
-import { MatchEvent } from '../model/match.event';
-import { MatchInfo } from '../model/match.info';
-import { ChampionDetails } from '../model/champion.details'
-import { isEmpty } from 'rxjs/operators';
+import { ChampionIdToChampionNameMap } from '../model/champion/champion.id.to.name.map';
+import { MatchEvent } from '../model/match/match.event';
+import { MatchInfo } from '../model/match/match.info';
 
 const MINION = "Minion";
 

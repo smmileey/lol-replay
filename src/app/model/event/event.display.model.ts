@@ -1,5 +1,4 @@
-import { ChampionDetails } from './champion.details';
-
+import { ChampionDetails } from '../champion/champion.details';
 
 export class EventDisplayModel
 {

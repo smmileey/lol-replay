@@ -14,9 +14,9 @@ import { PrettyJsonPipe } from './pretty-json.pipe';
 import {} from 'typedjson';
 import { MatchDetailsComponent } from './match-details/match-details.component';
 import { EventDisplayComponent } from './event-display/event-display.component'
-import { ChampionIdToChampionNameMap } from './model/champion.id.to.name.map';
 import { MaterialModule } from './material.module';
 import { ChampionInfoProvider } from './providers/champion.info.provider';
+import { ChampionIdToChampionNameMap } from './model/champion/champion.id.to.name.map';
 
 @NgModule({
   declarations: [

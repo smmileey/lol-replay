@@ -1,13 +1,13 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { MatchInfo } from '../model/match.info';
-import { Participant } from '../model/participant';
-import { MatchEvent } from '../model/match.event';
-import { EventDisplayModel } from '../model/event.display.model';
+import { Participant } from '../model/participant/participant';
+import { EventDisplayModel } from '../model/event/event.display.model';
 import { AssetsRepository } from '../repositories/assets.repostiory';
-import { EventType } from '../model/event.type';
+import { EventType } from '../model/event/event.type';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { ChampionInfoProvider } from '../providers/champion.info.provider';
-import { ChampionInfo } from '../model/champions.info';
+import { MatchInfo } from '../model/match/match.info';
+import { MatchEvent } from '../model/match/match.event';
+import { ChampionInfo } from '../model/champion/champions.info';
 
 const PVP_EVENTS = [EventType.Kill, EventType.Death]
 

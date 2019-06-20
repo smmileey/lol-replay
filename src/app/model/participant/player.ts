@@ -1,5 +1,4 @@
 
-
 export class Player
 {
     public currentPlatformId: string;

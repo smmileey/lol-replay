@@ -1,7 +1,7 @@
-import { ParticipantIdentity } from './participant.identity';
-import { TeamStats } from './team.stats';
-import { Participant } from './participant';
 import { jsonObject, jsonMember, jsonArrayMember } from 'typedjson';
+import { ParticipantIdentity } from '../participant/participant.identity';
+import { TeamStats } from '../team/team.stats';
+import { Participant } from '../participant/participant';
 
 
 @jsonObject
