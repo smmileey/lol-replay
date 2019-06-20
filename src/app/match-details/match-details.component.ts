@@ -1,9 +1,10 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChildren, QueryList } from '@angular/core';
 import { MatchInfo } from '../model/match.info';
 import { MatchTimeLine } from '../model/match.timeline';
 import { Participant } from '../model/participant';
 import { MatchEvent } from '../model/match.event';
 import { EventType } from '../model/event.type';
+import { EventDisplayComponent } from '../event-display/event-display.component';
 
 const CHAMPION_KILL = "CHAMPION_KILL";
 
@@ -14,9 +15,13 @@ const CHAMPION_KILL = "CHAMPION_KILL";
 })
 export class MatchDetailsComponent implements OnInit {
 
+  @ViewChildren(EventDisplayComponent)
+  childrenEventDisplayComponents: QueryList<EventDisplayComponent>;
+
   eventType = EventType;
   killEvents: MatchEvent[] = [];
   deathEvents: MatchEvent[] = [];
+  currentEventType: EventType;
 
   constructor() { }
 
@@ -36,8 +41,19 @@ export class MatchDetailsComponent implements OnInit {
   collapseId: number;
 
   async getEvents(eventType: EventType) {
+    this.setCurrentEventType(eventType);
     if (eventType == EventType.Kill) this.getKillEvents();
     if (eventType == EventType.Death) this.getDeathEvents();
+  }
+
+  async generateRecordingFile() {
+    console.log("Generating recording file...");
+    console.log("EventType: " + this.currentEventType.toString());
+    console.log("Events count: "+ this.childrenEventDisplayComponents.filter(child => child.eventType == this.currentEventType).length);
+  }
+
+  private async setCurrentEventType(eventType: EventType) {
+    this.currentEventType = eventType;
   }
 
   private async getKillEvents() {

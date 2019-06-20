@@ -5,7 +5,7 @@ import { MatchEvent } from '../model/match.event';
 import { EventDisplayModel } from '../model/event.display.model';
 import { AssetsRepository } from '../repositories/assets.repostiory';
 import { EventType } from '../model/event.type';
-import { FormControl, Validators } from '@angular/forms';
+import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { ChampionInfoProvider } from '../providers/champion.info.provider';
 import { ChampionInfo } from '../model/champions.info';
 
@@ -35,29 +35,36 @@ export class EventDisplayComponent implements OnInit {
 
   private readonly MaxRecordTimeAfterEventTimestamp = 60;
   private readonly MinRecordingLength = 5;
+  private readonly backOffsetInputName = "backOffsetInput";
+  private readonly recordLengthFormControlName = "recordLengthFormControl";
 
   model: EventDisplayModel = new EventDisplayModel();
   eventDataLoaded;
   backOffsetValue = 0;
   recordLengthValue = -this.backOffsetValue + this.MinRecordingLength;
-  backOffseInput = new FormControl(
-    this.backOffsetValue,
-    [
-      Validators.max(0),
-      Validators.min(-this.MaxRecordTimeAfterEventTimestamp),
-      Validators.required
-    ]);
-  recordLengthFormControl = new FormControl(
-    this.recordLengthValue,
-    [
-      Validators.max(-this.backOffsetValue + this.MaxRecordTimeAfterEventTimestamp),
-      Validators.min(-this.backOffsetValue + this.MinRecordingLength),
-      Validators.required
-    ]);
+  eventsFormGroup = new FormGroup({
+    backOffsetInput: new FormControl(
+      this.backOffsetValue,
+      [
+        Validators.max(0),
+        Validators.min(-this.MaxRecordTimeAfterEventTimestamp),
+        Validators.required
+      ]),
+      recordLengthFormControl: new FormControl(
+      this.recordLengthValue,
+      [
+        Validators.max(-this.backOffsetValue + this.MaxRecordTimeAfterEventTimestamp),
+        Validators.min(-this.backOffsetValue + this.MinRecordingLength),
+        Validators.required
+      ])
+  });
 
   constructor(
     private assetsRepository: AssetsRepository,
     private championInfoProvider: ChampionInfoProvider) { }
+
+  get backOffsetInput() { return this.eventsFormGroup.get(this.backOffsetInputName); }
+  get recordLengthFormControl() { return this.eventsFormGroup.get(this.recordLengthFormControlName); }
 
   ngOnInit() {
     this.UpdateRecordLengthErrorOnBackOffsetChange();
@@ -76,7 +83,7 @@ export class EventDisplayComponent implements OnInit {
 
   applyBackOffsetRangeChange(backOffsetRangeValue: number) {
     this.backOffsetValue = backOffsetRangeValue;
-    this.backOffseInput.setValue(backOffsetRangeValue);
+    this.backOffsetInput.setValue(backOffsetRangeValue);
   }
 
   applyBackOffsetInputChange(backOffsetInputValue: number) {
@@ -86,9 +93,9 @@ export class EventDisplayComponent implements OnInit {
   applyRecordLengthInputChange(recordLengthInputValue: number) {
     this.recordLengthValue = recordLengthInputValue;
   }
-  
+
   private UpdateRecordLengthErrorOnBackOffsetChange() {
-    this.backOffseInput.valueChanges.subscribe(newValue => {
+    this.backOffsetInput.valueChanges.subscribe(newValue => {
       let maxValue = -newValue + this.MaxRecordTimeAfterEventTimestamp;
       let minValue = -newValue + this.MinRecordingLength;
       this.recordLengthFormControl.setValidators([Validators.max(maxValue), Validators.min(minValue), Validators.required]);
@@ -110,7 +117,7 @@ export class EventDisplayComponent implements OnInit {
       this.model.victimImageUrl = await this.championInfoProvider.getVictimImageUrl(this.eventInfo, this.matchInfo);
     }
   }
-  
+
   private getEventOwnerName(): string {
     let championName = this.championInfoProvider.mapChampionIdToChampionName(this.chosenSummoner.championId)
     return this.championInfoProvider.formatChampionNameForRiotApiFormat(championName);

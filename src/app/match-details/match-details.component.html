@@ -22,15 +22,27 @@
             <div class="collapse" [id]='"killsCollapse"+collapseId' [attr.aria-labelledby]='"killsCollapse"+collapseId'
                 [attr.data-parent]='"#detailsCollapse"+collapseId'>
                 <div class="card card-body">
-                    <app-event-display *ngFor="let kill of killEvents; let eventId = index;" [chosenSummoner]="chosenSummoner"
-                        [matchInfo]="matchInfo" [killInfo]="kill" [eventType]="eventType.Kill" [eventDisplayId]="eventId"></app-event-display>
+                    <app-event-display *ngFor="let kill of killEvents; let eventId = index;"
+                        [chosenSummoner]="chosenSummoner" [matchInfo]="matchInfo" [killInfo]="kill"
+                        [eventType]="eventType.Kill" [eventDisplayId]="eventId"></app-event-display>
+                </div>
+                <div class="row top5">
+                    <div class="col">
+                        <button type="button" (click)="generateRecordingFile()">Generate recording</button>
+                    </div>
                 </div>
             </div>
             <div class="collapse" [id]='"deathsCollapse"+collapseId'
                 [attr.aria-labelledby]='"deathsCollapse"+collapseId' [attr.data-parent]='"#detailsCollapse"+collapseId'>
                 <div class="card card-body">
-                    <app-event-display *ngFor="let death of deathEvents; let eventId = index;" [chosenSummoner]="chosenSummoner"
-                        [matchInfo]="matchInfo" [killInfo]="death" [eventType]="eventType.Death" [eventDisplayId]="eventId"></app-event-display>
+                    <app-event-display *ngFor="let death of deathEvents; let eventId = index;"
+                        [chosenSummoner]="chosenSummoner" [matchInfo]="matchInfo" [killInfo]="death"
+                        [eventType]="eventType.Death" [eventDisplayId]="eventId"></app-event-display>
+                </div>
+                <div class="row top5">
+                    <div class="col">
+                        <button type="button" (click)="generateRecordingFile()">Generate recording</button>
+                    </div>
                 </div>
             </div>
         </div>

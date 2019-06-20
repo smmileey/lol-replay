@@ -5,81 +5,85 @@
 </ng-container>
 
 <ng-template #eventInfoTeplate>
-    <div class="row border border-dark top5">
-        <div class="col-4 top5 bot5">
-            <div class="text">
-                {{this.model.eventMinutesTime | number:'2.0-0'}}:{{this.model.eventSecondsTime | number:'2.0-0' }}
-                <img src="{{model?.killerImageUrl}}" class="rounded" alt="championImage">
-                >>>
-                <img src="{{model?.victimImageUrl}}" class="rounded" alt="championImage">
-            </div>
-        </div>
-        <div class="col-8 top5 bot5">
-            <div class="row">
-                <div class="col-3">
-                    <label for="backOffsetRangeControl">Back Offset: </label>
-                </div>
-                <div class="col-7">
-                    <input type="range" class="form-control-range" [min]='-MaxRecordTimeAfterEventTimestamp' max="0"
-                        [id]='"backOffsetRangeControl" + eventDisplayId'
-                        [name]='"backOffsetRangeControl" + eventDisplayId' [(ngModel)]="backOffsetValue"
-                        (ngModelChange)='applyBackOffsetRangeChange($event)'>
-                </div>
-                <div class="col-2">
-                    <input type="number" [min]='-MaxRecordTimeAfterEventTimestamp' max="0" class="form-control"
-                        [id]='"backOffseInput" + eventDisplayId' [name]='"backOffseInput" + eventDisplayId'
-                        [formControl]="backOffseInput" (ngModelChange)='applyBackOffsetInputChange($event)'>
+    <form [formGroup]="eventsFormGroup" (ngSubmit)="generateRecordingFile()">
+        <div class="row border border-dark top5">
+            <div class="col-4 top5 bot5">
+                <div class="text">
+                    {{this.model.eventMinutesTime | number:'2.0-0'}}:{{this.model.eventSecondsTime | number:'2.0-0' }}
+                    <img src="{{model?.killerImageUrl}}" class="rounded" alt="championImage">
+                    >>>
+                    <img src="{{model?.victimImageUrl}}" class="rounded" alt="championImage">
                 </div>
             </div>
-            <div class="row alert alert-danger" *ngIf="backOffseInput.invalid && (backOffseInput.dirty || backOffseInput.touched)">
-                <div *ngIf="backOffseInput.errors.required">
-                    Back Offset value is required.
+            <div class="col-8 top5 bot5">
+                <div class="row">
+                    <div class="col-3">
+                        <label for="backOffsetRangeControl">Back Offset: </label>
+                    </div>
+                    <div class="col-7">
+                        <input type="range" class="form-control-range" [min]='-MaxRecordTimeAfterEventTimestamp' max="0"
+                            [id]='"backOffsetRangeControl" + eventDisplayId'
+                            [name]='"backOffsetRangeControl" + eventDisplayId' [(ngModel)]="backOffsetValue"
+                            [ngModelOptions]="{standalone: true}" (ngModelChange)='applyBackOffsetRangeChange($event)'>
+                    </div>
+                    <div class="col-2">
+                        <input type="number" [min]='-MaxRecordTimeAfterEventTimestamp' max="0" class="form-control"
+                            [id]='"backOffsetInput" + eventDisplayId' [name]='"backOffsetInput" + eventDisplayId'
+                            formControlName="backOffsetInput" (ngModelChange)='applyBackOffsetInputChange($event)'>
+                    </div>
                 </div>
-                <div *ngIf="backOffseInput.errors.min">
-                    Back Offset value must be at minimum set to -{{MaxRecordTimeAfterEventTimestamp}}.
+                <div class="row alert alert-danger"
+                    *ngIf="backOffsetInput.invalid && (backOffsetInput.dirty || backOffsetInput.touched)">
+                    <div *ngIf="backOffseInput.errors.required">
+                        Back Offset value is required.
+                    </div>
+                    <div *ngIf="backOffsetInput.errors.min">
+                        Back Offset value must be at minimum set to -{{MaxRecordTimeAfterEventTimestamp}}.
+                    </div>
+                    <div *ngIf="backOffsetInput.errors.max">
+                        Back Offset value must be at maximum set to 0.
+                    </div>
                 </div>
-                <div *ngIf="backOffseInput.errors.max">
-                    Back Offset value must be at maximum set to 0.
+                <div class="row">
+                    <div class="col-10">
+                        <label for="recordLength">Recording length: </label>
+                    </div>
+                    <div class="col-2">
+                        <input type="number" [min]='-backOffsetValue+MinRecordingLength'
+                            [max]='-backOffsetValue+MaxRecordTimeAfterEventTimestamp' class="form-control"
+                            [id]='"recordLength" + eventDisplayId' [name]='"recordLength" + eventDisplayId'
+                            (ngModelChange)='applyRecordLengthInputChange($event)'
+                            formControlName="recordLengthFormControl">
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-10">
-                    <label for="recordLength">Recording length: </label>
-                </div>
-                <div class="col-2">
-                    <input type="number" [min]='-backOffsetValue+MinRecordingLength'
-                        [max]='-backOffsetValue+MaxRecordTimeAfterEventTimestamp' class="form-control"
-                        [id]='"recordLength" + eventDisplayId' [name]='"recordLength" + eventDisplayId'
-                        (ngModelChange)='applyRecordLengthInputChange($event)' [formControl]="recordLengthFormControl">
-                </div>
-            </div>
-            <div class="row alert alert-danger" *ngIf="recordLengthFormControl.invalid">
-                <div *ngIf="recordLengthFormControl.errors.required">
-                    Recording length value is required.
-                </div>
-                <div *ngIf="recordLengthFormControl.errors.min">
-                    Recording length value must be at minimum set to {{-backOffsetValue+MinRecordingLength}}
-                    (You
-                    have set
-                    Back Offset to
-                    {{backOffsetValue}}s., min. record time is {{MinRecordingLength}}s. Currently record
-                    time
-                    would
-                    be
-                    {{recordLengthFormControl.value+backOffsetValue}}s., can't do :D ).
-                </div>
-                <div *ngIf="recordLengthFormControl.errors.max">
-                    Recording length value must be at maximum set to
-                    {{-backOffsetValue+MaxRecordTimeAfterEventTimestamp}}
-                    (You have set Back Offset to
-                    {{backOffsetValue}}, max. record time after death is
-                    {{MaxRecordTimeAfterEventTimestamp}}s.
-                    Currently
-                    record time would be
-                    {{recordLengthFormControl.value+backOffsetValue}}s., can't do :D ).
-                </div>
+                <div class="row alert alert-danger" *ngIf="recordLengthFormControl.invalid">
+                    <div *ngIf="recordLengthFormControl.errors.required">
+                        Recording length value is required.
+                    </div>
+                    <div *ngIf="recordLengthFormControl.errors.min">
+                        Recording length value must be at minimum set to {{-backOffsetValue+MinRecordingLength}}
+                        (You
+                        have set
+                        Back Offset to
+                        {{backOffsetValue}}s., min. record time is {{MinRecordingLength}}s. Currently record
+                        time
+                        would
+                        be
+                        {{recordLengthFormControl.value+backOffsetValue}}s., can't do :D ).
+                    </div>
+                    <div *ngIf="recordLengthFormControl.errors.max">
+                        Recording length value must be at maximum set to
+                        {{-backOffsetValue+MaxRecordTimeAfterEventTimestamp}}
+                        (You have set Back Offset to
+                        {{backOffsetValue}}, max. record time after death is
+                        {{MaxRecordTimeAfterEventTimestamp}}s.
+                        Currently
+                        record time would be
+                        {{recordLengthFormControl.value+backOffsetValue}}s., can't do :D ).
+                    </div>
 
+                </div>
             </div>
         </div>
-    </div>
+    </form>
 </ng-template>
