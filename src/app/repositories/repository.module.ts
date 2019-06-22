@@ -5,6 +5,7 @@ import { MatchRepository } from './match.repository';
 import { AssetsRepository } from './assets.repostiory';
 import { DataDragonRepository } from './ddragon.repository';
 import { HttpClientModule } from '@angular/common/http';
+import { FileRepository } from './file.repository';
 
 @NgModule({
   declarations: [],
@@ -12,6 +13,6 @@ import { HttpClientModule } from '@angular/common/http';
     HttpClientModule,
     CommonModule
   ],
-  providers: [RestDataSource, MatchRepository, AssetsRepository, DataDragonRepository]
+  providers: [RestDataSource, MatchRepository, AssetsRepository, DataDragonRepository, FileRepository]
 })
 export class RepositoryModule { }

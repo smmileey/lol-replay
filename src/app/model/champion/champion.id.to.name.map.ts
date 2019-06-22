@@ -143,6 +143,7 @@ export class ChampionIdToChampionNameMap {
         this.mappings.put("555", "Pyke")
         this.mappings.put("164", "Camille")
         this.mappings.put("518", "Neeko")
+        this.mappings.put("142", "Zoe")
         this.mappings.put("0", "Minion")
     }
 }

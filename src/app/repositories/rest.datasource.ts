@@ -3,7 +3,7 @@ import { Observable } from "rxjs";
 import { HttpClient } from "@angular/common/http";
 
 const PROTOCOL = "https";
-const API_KEY = "RGAPI-3599826f-e37b-40c1-b0a5-2852baa33fcf";
+const API_KEY = "RGAPI-c9f8a37e-cc08-4899-958b-eef6f28b471e";
 
 @Injectable()
 export class RestDataSource {

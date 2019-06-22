@@ -5,6 +5,11 @@ import { EventType } from '../model/event/event.type';
 import { EventDisplayComponent } from '../event-display/event-display.component';
 import { MatchEvent } from '../model/match/match.event';
 import { MatchInfo } from '../model/match/match.info';
+import { ReplayPlayback } from '../model/recording/replay.playback';
+import { TypedJSON } from 'typedjson';
+import { Observable, Observer } from 'rxjs';
+import { FileRepository } from '../repositories/file.repository';
+import { SafeUrl } from '@angular/platform-browser';
 
 const CHAMPION_KILL = "CHAMPION_KILL";
 
@@ -22,8 +27,12 @@ export class MatchDetailsComponent implements OnInit {
   killEvents: MatchEvent[] = [];
   deathEvents: MatchEvent[] = [];
   currentEventType: EventType;
+  replayPlaybacks: ReplayPlayback[] = [];
+  replayPlaybackLoaded: boolean = false;
+  downloadLink: SafeUrl;
+  generateClicked: boolean = false;
 
-  constructor() { }
+  constructor(private fileRepository: FileRepository) { }
 
   ngOnInit() {
   }
@@ -42,14 +51,25 @@ export class MatchDetailsComponent implements OnInit {
 
   async getEvents(eventType: EventType) {
     this.setCurrentEventType(eventType);
+    this.resetReplayPlaybacks();
     if (eventType == EventType.Kill) this.getKillEvents();
     if (eventType == EventType.Death) this.getDeathEvents();
   }
 
   async generateRecordingFile() {
-    console.log("Generating recording file...");
-    console.log("EventType: " + this.currentEventType.toString());
-    console.log("Events count: "+ this.childrenEventDisplayComponents.filter(child => child.eventType == this.currentEventType).length);
+    this.generateClicked = true;
+    let eventsToProcess = this.childrenEventDisplayComponents.filter(child => child.eventType == this.currentEventType);
+    await eventsToProcess.forEach(eventToProcess => {
+      this.replayPlaybacks.push(new ReplayPlayback(eventToProcess.recordLengthValue, false, true, 1, eventToProcess.eventInfo.timestamp));
+    });
+    this.downloadLink = this.fileRepository.generateJsonUri(this.replayPlaybacks);
+    this.replayPlaybackLoaded = true;
+  }
+
+  private async resetReplayPlaybacks() {
+    this.generateClicked = false;
+    this.replayPlaybackLoaded = false;
+    this.replayPlaybacks = [];
   }
 
   private async setCurrentEventType(eventType: EventType) {

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewChildren, QueryList } from '@angular/core';
+import { Component, OnInit, ViewChildren, QueryList } from '@angular/core';
 import { MatchRepository } from '../repositories/match.repository';
 import { MatchComponent } from '../match/match.component';
 import { MatchList } from '../model/match/match.list';
